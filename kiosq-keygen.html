@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Lisensi — KiosQ</title>
+<style>
+  :root{
+    --ink:#151a24;
+    --ink-soft:#5b6472;
+    --line:#dfe3ea;
+    --paper:#f7f8fa;
+    --card:#ffffff;
+    --accent:#2454ff;
+    --accent-ink:#0e2e8f;
+    --good:#1a7f4e;
+    --good-bg:#e7f6ee;
+    --warn-bg:#fff2e0;
+    --warn-ink:#8a4b00;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    padding:32px 16px 80px;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+  header{margin-bottom:28px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;color:var(--accent-ink);
+    background:#e8edff;border-radius:100px;padding:4px 12px;
+    margin-bottom:14px;font-weight:600;
+  }
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-0.01em;}
+  .sub{color:var(--ink-soft);font-size:14.5px;line-height:1.5;max-width:56ch;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px;
+    margin-bottom:20px;
+  }
+  .card h2{font-size:15px;margin:0 0 16px;color:var(--ink);}
+  label{
+    display:block;font-size:13px;font-weight:600;color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  input[type="text"], input[type="number"]{
+    width:100%;
+    font-size:15px;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    font-family:var(--mono);
+    background:#fbfbfc;
+    color:var(--ink);
+  }
+  input[type="text"]:focus, input[type="number"]:focus{
+    outline:none;border-color:var(--accent);background:#fff;
+    box-shadow:0 0 0 3px rgba(36,84,255,0.12);
+  }
+  #namaPembeli{font-family:inherit;}
+  .row2{display:grid;grid-template-columns:1fr 120px;gap:12px;}
+
+  button{
+    font-size:14.5px;font-weight:600;
+    border:none;border-radius:9px;
+    padding:11px 18px;cursor:pointer;
+    transition:transform .05s ease, opacity .15s ease;
+  }
+  button:active{transform:scale(0.98);}
+  .btn-primary{
+    background:var(--accent);color:#fff;width:100%;
+    padding:13px 18px;font-size:15px;margin-top:4px;
+  }
+  .btn-primary:disabled{opacity:.55;cursor:default;}
+  .btn-ghost{
+    background:#eef1f6;color:var(--ink);
+  }
+  .btn-ghost:hover{background:#e4e8ef;}
+
+  .result{
+    display:none;
+    margin-top:18px;
+    background:var(--good-bg);
+    border:1px solid #bfe4cf;
+    border-radius:12px;
+    padding:18px;
+  }
+  .result.show{display:block;}
+  .result .lbl{font-size:12px;color:var(--good);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+  .key-box{
+    display:flex;align-items:center;gap:10px;
+    background:#fff;border:1px solid #bfe4cf;border-radius:9px;
+    padding:12px 14px;margin-bottom:12px;
+  }
+  .key-box code{
+    font-family:var(--mono);font-size:17px;font-weight:700;
+    color:var(--ink);letter-spacing:.02em;flex:1;
+    word-break:break-all;
+  }
+  .actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .note{
+    font-size:13px;color:var(--warn-ink);
+    background:var(--warn-bg);border-radius:10px;
+    padding:12px 14px;line-height:1.55;
+  }
+  .note b{font-weight:700;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--ink-soft);padding:8px 6px;border-bottom:1px solid var(--line);
+  }
+  td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:top;}
+  td.key{font-family:var(--mono);font-size:12.5px;}
+  td.muted{color:var(--ink-soft);font-size:12.5px;}
+  .empty{color:var(--ink-soft);font-size:13.5px;padding:18px 4px;text-align:center;}
+  .del{
+    background:none;border:none;color:#b3261e;font-size:12.5px;
+    cursor:pointer;padding:4px 6px;font-weight:600;
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:100px;
+    font-size:13.5px;opacity:0;transition:all .25s ease;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">🔑 Tool internal penjual — jangan dibagikan ke pembeli</div>
+    <h1>Generator Lisensi KiosQ</h1>
+    <p class="sub">Tempel Device ID yang dikirim pembeli, generate license key-nya, lalu kirim balik. Semua diproses di browser kamu sendiri — tidak ada yang dikirim ke server manapun.</p>
+  </header>
+
+  <div class="card">
+    <h2>Buat license key baru</h2>
+
+    <div class="field">
+      <label for="deviceId">Device ID dari pembeli</label>
+      <input type="text" id="deviceId" placeholder="Contoh: 8F3C1A9B2D4E5601" autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="namaPembeli">Nama pembeli / toko (opsional)</label>
+        <input type="text" id="namaPembeli" placeholder="Contoh: Toko Barokah" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="tahun">Tahun</label>
+        <input type="number" id="tahun" value="2026">
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btnGenerate">Generate License Key</button>
+
+    <div class="result" id="result">
+      <div class="lbl">✅ License key siap</div>
+      <div class="key-box">
+        <code id="outKey">—</code>
+        <button class="btn-ghost" id="btnCopyKey">Salin</button>
+      </div>
+      <div class="actions">
+        <button class="btn-ghost" id="btnCopyWa">Salin pesan WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Catatan penting:</b> license key ini terikat ke Device ID spesifik dan tidak ada masa kedaluwarsa setelah diaktifkan (sekali aktivasi, aktif selamanya di perangkat itu). Pastikan Device ID yang dikirim pembeli benar persis (huruf besar/kecil tidak masalah, tapi karakternya harus pas) — kalau salah satu karakter saja beda, key tidak akan valid di perangkat mereka.
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h2>Riwayat license yang sudah dibuat (tersimpan di browser ini)</h2>
+    <table>
+      <thead>
+        <tr><th>Tanggal</th><th>Pembeli</th><th>Device ID</th><th>License Key</th><th></th></tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+    <div class="empty" id="emptyState" style="display:none;">Belum ada license yang dibuat.</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const HMAC_SECRET = "K1OSQ-S3CR3T-2026-@#!"; // harus SAMA PERSIS dengan HMAC_SECRET di LicenseManager.kt
+
+async function hmacSha256Hex(secret, message) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Mirror persis dari LicenseManager.kt: generateLicenseKey() / generateCode()
+async function generateLicenseKey(deviceId, year) {
+  const data = `${deviceId}KIOSQ${year}`;
+  const hex = await hmacSha256Hex(HMAC_SECRET, data);
+  const code = hex.slice(0, 6).toUpperCase();
+  return `KIOSQ-PRO-${year}-${code}`;
+}
+
+const STORAGE_KEY = "kiosq_keygen_history";
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+  catch (e) { return []; }
+}
+function saveHistory(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+function renderHistory() {
+  const list = loadHistory();
+  const body = document.getElementById("historyBody");
+  const empty = document.getElementById("emptyState");
+  body.innerHTML = "";
+  if (list.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  list.slice().reverse().forEach((item, idxRev) => {
+    const idx = list.length - 1 - idxRev;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="muted">${item.tanggal}</td>
+      <td>${item.nama || "-"}</td>
+      <td class="key">${item.deviceId}</td>
+      <td class="key">${item.key}</td>
+      <td><button class="del" data-idx="${idx}">Hapus</button></td>
+    `;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll(".del").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const list2 = loadHistory();
+      list2.splice(parseInt(btn.dataset.idx, 10), 1);
+      saveHistory(list2);
+      renderHistory();
+    });
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+let lastGenerated = null;
+
+document.getElementById("btnGenerate").addEventListener("click", async () => {
+  const btn = document.getElementById("btnGenerate");
+  const deviceIdRaw = document.getElementById("deviceId").value.trim();
+  const nama = document.getElementById("namaPembeli").value.trim();
+  const tahun = parseInt(document.getElementById("tahun").value, 10) || new Date().getFullYear();
+
+  if (!deviceIdRaw) {
+    document.getElementById("deviceId").focus();
+    showToast("Isi Device ID dulu");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Membuat key...";
+
+  const deviceId = deviceIdRaw.toUpperCase();
+  const key = await generateLicenseKey(deviceId, tahun);
+
+  document.getElementById("outKey").textContent = key;
+  document.getElementById("result").classList.add("show");
+
+  lastGenerated = { deviceId, nama, key };
+
+  const history = loadHistory();
+  history.push({
+    tanggal: new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+    nama, deviceId, key
+  });
+  saveHistory(history);
+  renderHistory();
+
+  btn.disabled = false;
+  btn.textContent = "Generate License Key";
+});
+
+document.getElementById("btnCopyKey").addEventListener("click", () => {
+  if (!lastGenerated) return;
+  navigator.clipboard.writeText(lastGenerated.key);
+  showToast("License key disalin");
+});
+
+document.getElementById("btnCopyWa").addEventListener("click", () => {
+  if (!lastGenerated) return;
+  const nama = lastGenerated.nama ? lastGenerated.nama : "Kak";
+  const msg = `Halo ${nama}, terima kasih sudah membeli KiosQ! 🙏\n\nBerikut license key kamu:\n${lastGenerated.key}\n\nCara aktivasi:\n1. Buka KiosQ, masuk ke menu License\n2. Masukkan key di atas, tekan "Aktivasi Sekarang"\n3. Selesai — semua fitur langsung terbuka\n\nKalau ada kendala aktivasi, tinggal chat saya lagi ya.`;
+  navigator.clipboard.writeText(msg);
+  showToast("Pesan WhatsApp disalin");
+});
+
+renderHistory();
+</script>
+</body>
+</html>
